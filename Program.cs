@@ -26,7 +26,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequiredLength = 6;
     options.Password.RequiredUniqueChars = 1;
     options.SignIn.RequireConfirmedEmail = false;
-   
+
 
 
     // Lockout settings.
@@ -41,8 +41,16 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policyBuilder => policyBuilder.RequireRole("Admin"));
+});
 
+builder.Services.AddRazorPages(options =>
+{
+    // options.Conventions.AuthorizeFolder("/RoleManager", "AdminPolicy");
 
+});
 
 
 var app = builder.Build();
