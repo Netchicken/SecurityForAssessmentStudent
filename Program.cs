@@ -43,12 +43,25 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminPolicy", policyBuilder => policyBuilder.RequireRole("Admin"));
+    options.AddPolicy("RoleAdminPolicy", policyBuilder => policyBuilder.RequireRole("Admin"));
+    options.AddPolicy("ClaimAdminPolicy", policyBuilder => policyBuilder.RequireClaim("Admin"));
+
+    options.AddPolicy("ViewRolesPolicy", policyBuilder => policyBuilder.RequireAssertion(context =>
+    {
+        var joiningDateClaim = context.User.FindFirst(c => c.Type == "Joining Date")?.Value;
+        var joiningDate = DateTime.Parse(joiningDateClaim);
+        return context.User.HasClaim("Permission", "View Roles") && joiningDate > DateTime.MinValue && joiningDate < DateTime.Now.AddMonths(-6);
+
+    }));
+    //context.User.HasClaim("Permission", "View Roles") && 
 });
+
+builder.Services.AddSwaggerGen();
+
 
 builder.Services.AddRazorPages(options =>
 {
-    // options.Conventions.AuthorizeFolder("/RoleManager", "AdminPolicy");
+    options.Conventions.AuthorizeFolder("/RoleManager", "ViewRolesPolicy");
 
 });
 
@@ -67,6 +80,9 @@ else
     app.UseHsts();
 }
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -75,6 +91,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapControllers();
 app.MapRazorPages();
 
 app.Run();

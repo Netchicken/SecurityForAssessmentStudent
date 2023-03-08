@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
+using SecurityForAssessmentStudent.Models;
+
 namespace SecurityForAssessmentStudent.Data
 {
     public class ApplicationDbContext : IdentityDbContext
@@ -9,5 +11,8 @@ namespace SecurityForAssessmentStudent.Data
             : base(options)
         {
         }
+
+        public DbSet<Movie> Movie { get; set; }
+        public DbSet<Cast> Cast { get; set; }
     }
 }
