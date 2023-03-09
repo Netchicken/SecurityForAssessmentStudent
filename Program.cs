@@ -3,7 +3,20 @@ using Microsoft.EntityFrameworkCore;
 
 using SecurityForAssessmentStudent.Data;
 
+
+var CORSAllowSpecificOrigins = "CORSAllowed";
 var builder = WebApplication.CreateBuilder(args);
+
+//add CORS to project
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: CORSAllowSpecificOrigins,
+                         policy =>
+                         {
+                             policy.WithOrigins("http://localhost:3001", "http://localhost:3000", "http://www.contoso.com");
+                         });
+});
+
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -87,6 +100,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors(CORSAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
